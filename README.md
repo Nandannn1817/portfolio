@@ -187,3 +187,85 @@ tasks.register("hello") {
     }
 }
 
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/devops-ds/your-gradle-project.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh './gradlew clean build'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh './gradlew test'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit '**/build/test-results/test/*.xml'
+        }
+    }
+}
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/devops-ds/your-maven-project.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '/usr/bin/mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Tests assumed to run during Build
+            }
+        }
+    }
+
+    post {
+        always {
+            junit '**/target/surefire-reports/*.xml'
+        }
+    }
+}
+
+
+---
+- name: Basic Server Setup
+  hosts: local
+  become: yes 
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
+
+
+
+
